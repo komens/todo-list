@@ -9,7 +9,7 @@ export interface IEventItem {
   doneTime?: number;
 }
 export interface IState {
-  eventList: Array<IEventItem>;
+  eventList: IEventItem[];
 }
 
 const initState: IState = {
@@ -20,7 +20,6 @@ const ADD_EVENT = "ADD_EVENT";
 const DEL_EVENT = "DEL_EVENT";
 const DONE_EVENT = "DONE_EVENT";
 const RESET_EVENT = "RESET_EVENT";
-
 
 export const addEvent = (text: string) => {
   return {

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
 import {
   addEvent,
@@ -25,7 +25,14 @@ const navList = [
   },
 ];
 
-const TodoList = ({ list, dbClick, removeEvent }: any = []) => {
+interface ITodoListProps {
+  list: Array<IEventItem>;
+  dbClick: (status: number, id: string) => void;
+  removeEvent: (id: string) => void;
+}
+
+
+const TodoList:FC<ITodoListProps> = ({ list, dbClick, removeEvent }) => {
   return (
     <ul className="list">
       {list.map((item: any) => (
