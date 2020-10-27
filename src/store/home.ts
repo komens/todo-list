@@ -1,23 +1,19 @@
 import UUID from "../utils/uuid";
+import { saveData, getData } from "../utils/storage";
 
-export interface IEventList {
+export interface IEventItem {
   id: string;
   text: string;
   status: number;
   createdTime: number;
   doneTime?: number;
 }
+export interface IState {
+  eventList: Array<IEventItem>;
+}
 
-const initState = {
-  eventList: [
-    {
-      id: "00122",
-      text: "这里是内容",
-      status: 0,
-      createdTime: 1603781607694,
-      doneTime: 1603781607694,
-    },
-  ],
+const initState: IState = {
+  eventList: getData("event_list") || [],
 };
 
 const ADD_EVENT = "ADD_EVENT";
@@ -25,42 +21,44 @@ const DEL_EVENT = "DEL_EVENT";
 const DONE_EVENT = "DONE_EVENT";
 const RESET_EVENT = "RESET_EVENT";
 
-interface IPayload {
-    type?: string,
-    text?: string,
-    id?: string
-}
 
-export const addEvent = (payload: IPayload) => {
+export const addEvent = (text: string) => {
   return {
     type: ADD_EVENT,
-    text: payload.text,
+    text: text,
   };
 };
 
-export const delEvent = (payload: IPayload) => {
+export type ID = string;
+
+export const delEvent = (id: ID) => {
   return {
     type: DEL_EVENT,
-    id: payload.id,
+    id: id,
   };
 };
 
-export const doneEvent = (payload: IPayload) => {
+export const doneEvent = (id: ID) => {
   return {
     type: DONE_EVENT,
-    id: payload.id,
+    id: id,
   };
 };
 
-export const resetEvent = (payload: IPayload) => {
+export const resetEvent = (id: ID) => {
   return {
     type: RESET_EVENT,
-    id: payload.id,
+    id: id,
   };
 };
 
+interface IPayload {
+  type?: string;
+  text?: string;
+  id?: string;
+}
 
-export default (state = initState, { type, text, id }: IPayload) => {
+export default (state: IState = initState, { type, text, id }: IPayload) => {
   switch (type) {
     case ADD_EVENT: {
       // 添加事件
@@ -72,39 +70,46 @@ export default (state = initState, { type, text, id }: IPayload) => {
         id: uuid,
         createdTime,
       };
+      const newList = [...state.eventList, event];
+      saveData("event_list", newList);
       return {
-        eventList: [...state.eventList, event],
+        eventList: newList,
       };
     }
     case DONE_EVENT: {
       // 完成事件
+      const newList = state.eventList.map((item) => {
+        if (item.id === id) {
+          item.status = 1;
+          item.doneTime = new Date().getTime();
+        }
+        return item;
+      });
+      saveData("event_list", newList);
       return {
-        eventList: state.eventList.map((item) => {
-          if (item.id === id) {
-            item.status = 1;
-            item.doneTime = new Date().getTime();
-          }
-          return item;
-        }),
+        eventList: newList,
       };
     }
     case RESET_EVENT: {
       //重置事件
+      const newList = state.eventList.map((item) => {
+        if (item.id === id) {
+          item.status = 0;
+          item.doneTime = -1;
+        }
+        return item;
+      });
+      saveData("event_list", newList);
       return {
-        eventList: state.eventList.map((item) => {
-          if (item.id === id) {
-            item.status = 0;
-            item.doneTime = -1;
-          }
-          return item;
-        }),
+        eventList: newList,
       };
     }
     case DEL_EVENT: {
-        console.log("dell")
       // 删除事件
+      const newList = state.eventList.filter((item) => item.id !== id);
+      saveData("event_list", newList);
       return {
-        eventList: state.eventList.filter((item) => item.id !== id),
+        eventList: newList,
       };
     }
     default: {

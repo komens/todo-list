@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
-import { addEvent, doneEvent, resetEvent, delEvent } from "../../store/home";
+import {
+  addEvent,
+  doneEvent,
+  resetEvent,
+  delEvent,
+  IEventItem,
+} from "../../store/home";
 import "../../style/home/index.scss";
 import imageURL from "../../assets/images/del_btn.svg";
 
@@ -57,8 +63,22 @@ const TodoList = ({ list, dbClick, removeEvent }: any = []) => {
   );
 };
 
-const Home = ({ eventList, addEvent, doneEvent, resetEvent, delEvent }: any) => {
-  const [list, setList] = useState([]);
+interface IHomeProps {
+  eventList: Array<IEventItem>;
+  addEvent: (text: string) => void;
+  doneEvent: (text: string) => void;
+  resetEvent: (text: string) => void;
+  delEvent: (text: string) => void;
+}
+
+const Home = ({
+  eventList,
+  addEvent,
+  doneEvent,
+  resetEvent,
+  delEvent,
+}: IHomeProps) => {
+  const [list, setList] = useState<Array<IEventItem>>();
   const [curNav, setCurNav] = useState(1);
 
   let inputEle = useRef<HTMLInputElement>(null);
@@ -70,8 +90,11 @@ const Home = ({ eventList, addEvent, doneEvent, resetEvent, delEvent }: any) => 
   // 添加事件
   const handleAddEvent = () => {
     const val = inputEle.current?.value.trim();
+    if (!val) {
+      return;
+    }
     inputEle.current && (inputEle.current.value = "");
-    addEvent({ text: val });
+    addEvent(val);
   };
 
   // 导航点击切换
@@ -104,11 +127,11 @@ const Home = ({ eventList, addEvent, doneEvent, resetEvent, delEvent }: any) => 
   const handleEventClick = (status: number, id: string) => {
     switch (status) {
       case 0: {
-        doneEvent({ id });
+        doneEvent(id);
         break;
       }
       case 1: {
-        resetEvent({ id });
+        resetEvent(id);
         break;
       }
     }
@@ -116,9 +139,9 @@ const Home = ({ eventList, addEvent, doneEvent, resetEvent, delEvent }: any) => 
 
   // 删除事件
   const handleDelEvent = (id: string) => {
-    const isDel = window.confirm('确定要删除该事件吗？')
-    isDel && delEvent({id})
-  }
+    const isDel = window.confirm("确定要删除该事件吗？");
+    isDel && delEvent(id);
+  };
 
   return (
     <div className="home">
@@ -154,7 +177,11 @@ const Home = ({ eventList, addEvent, doneEvent, resetEvent, delEvent }: any) => 
             </div>
           ))}
         </nav>
-        <TodoList list={list} dbClick={handleEventClick} removeEvent={handleDelEvent} />
+        <TodoList
+          list={list || []}
+          dbClick={handleEventClick}
+          removeEvent={handleDelEvent}
+        />
       </div>
     </div>
   );
@@ -170,6 +197,6 @@ export default connect(
     addEvent,
     doneEvent,
     resetEvent,
-    delEvent
+    delEvent,
   }
 )(Home);
