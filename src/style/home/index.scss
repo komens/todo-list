@@ -66,6 +66,7 @@
         }
       }
       &.done {
+        border-color: $event-done-color;
         .content::before {
           content: "✔";
           color: $event-done-color;
