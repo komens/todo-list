@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 import { connect } from "react-redux";
 import {
   addEvent,
@@ -13,15 +13,15 @@ import imageURL from "../../assets/images/del_btn.svg";
 const navList = [
   {
     name: "全部",
-    key: 1,
-  },
-  {
-    name: "未完成",
     key: 2,
   },
   {
+    name: "未完成",
+    key: 0,
+  },
+  {
     name: "已完成",
-    key: 3,
+    key: 1,
   },
 ];
 
@@ -31,8 +31,7 @@ interface ITodoListProps {
   removeEvent: (id: string) => void;
 }
 
-
-const TodoList:FC<ITodoListProps> = ({ list, dbClick, removeEvent }) => {
+const TodoList: FC<ITodoListProps> = ({ list, dbClick, removeEvent }) => {
   return (
     <ul className="list">
       {list.map((item: any) => (
@@ -78,56 +77,32 @@ interface IHomeProps {
   delEvent: (text: string) => void;
 }
 
-const Home:FC<IHomeProps> = ({
+const Home: FC<IHomeProps> = ({
   eventList,
   addEvent,
   doneEvent,
   resetEvent,
   delEvent,
 }) => {
-  const [list, setList] = useState<IEventItem[]>([]);
   const [curNav, setCurNav] = useState(1);
+  const [inputValue, setInputValue] = useState("");
 
-  let inputEle = useRef<HTMLInputElement>(null);
+  const list: IEventItem[] = useMemo(() => {
+    return eventList.filter((item) => curNav === 2 || item.status === curNav);
+  }, [curNav, eventList]);
 
-  useEffect(() => {
-    handleUpdateList();
-  }, [eventList]);
-
+  // 输入事件
+  const handleInput = (e) => {
+    const value = e.target.value;
+    setInputValue(value.trim());
+  };
   // 添加事件
   const handleAddEvent = () => {
-    const val = inputEle.current?.value.trim();
-    if (!val) {
+    if (!inputValue) {
       return;
     }
-    inputEle.current && (inputEle.current.value = "");
-    addEvent(val);
-  };
-
-  // 导航点击切换
-  const handleNavClick = (key: number) => {
-    setCurNav(key);
-    handleUpdateList(key);
-  };
-
-  // 更新列表
-  const handleUpdateList = (key: number = curNav) => {
-    switch (key) {
-      case 1: {
-        setList(eventList);
-        break;
-      }
-      case 2: {
-        let newList = eventList.filter((item) => item.status === 0);
-        setList(newList);
-        break;
-      }
-      case 3: {
-        let newList = eventList.filter((item) => item.status === 1);
-        setList(newList);
-        break;
-      }
-    }
+    addEvent(inputValue);
+    setInputValue("");
   };
 
   // 双击记录
@@ -158,7 +133,8 @@ const Home:FC<IHomeProps> = ({
           <input
             type="text"
             className="input_text"
-            ref={inputEle}
+            value={inputValue}
+            onChange={handleInput}
             onKeyDown={(e) => {
               e.key === "Enter" && handleAddEvent();
             }}
@@ -177,7 +153,7 @@ const Home:FC<IHomeProps> = ({
               }
               key={nav.key}
               onClick={() => {
-                handleNavClick(nav.key);
+                setCurNav(nav.key);
               }}
             >
               {nav.name}
