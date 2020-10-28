@@ -21,10 +21,23 @@ const DEL_EVENT = "DEL_EVENT";
 const DONE_EVENT = "DONE_EVENT";
 const RESET_EVENT = "RESET_EVENT";
 
-export const addEvent = (text: string) => {
+function addEventMutation(event) {
   return {
     type: ADD_EVENT,
-    text: text,
+    event: event,
+  };
+}
+export const addEvent = (text: string) => {
+  return (dispatch) => {
+    const uuid = UUID();
+    const createdTime = new Date().getTime();
+    const event = {
+      text,
+      status: 0,
+      id: uuid,
+      createdTime,
+    };
+    dispatch(addEventMutation(event));
   };
 };
 
@@ -53,22 +66,14 @@ export const resetEvent = (id: ID) => {
 
 interface IPayload {
   type?: string;
-  text?: string;
+  event?: IEventItem;
   id?: string;
 }
 
-export default (state: IState = initState, { type, text, id }: IPayload) => {
+export default (state: IState = initState, { type, event, id }: IPayload) => {
   switch (type) {
     case ADD_EVENT: {
       // 添加事件
-      const uuid = UUID();
-      const createdTime = new Date().getTime();
-      const event = {
-        text,
-        status: 0,
-        id: uuid,
-        createdTime,
-      };
       const newList = [...state.eventList, event];
       saveData("event_list", newList);
       return {
