@@ -8,4 +8,4 @@
 `yarn start`
 运行项目
 
-[项目截图](https://s1.ax1x.com/2020/10/28/B1wjv4.png)](https://imgchr.com/i/B1wjv4)
+[![B1wjv4.png](https://s1.ax1x.com/2020/10/28/B1wjv4.png)](https://imgchr.com/i/B1wjv4)
