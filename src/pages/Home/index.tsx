@@ -78,14 +78,14 @@ interface IHomeProps {
   delEvent: (text: string) => void;
 }
 
-const Home = ({
+const Home:FC<IHomeProps> = ({
   eventList,
   addEvent,
   doneEvent,
   resetEvent,
   delEvent,
-}: IHomeProps) => {
-  const [list, setList] = useState<Array<IEventItem>>();
+}) => {
+  const [list, setList] = useState<IEventItem[]>([]);
   const [curNav, setCurNav] = useState(1);
 
   let inputEle = useRef<HTMLInputElement>(null);
@@ -185,7 +185,7 @@ const Home = ({
           ))}
         </nav>
         <TodoList
-          list={list || []}
+          list={list}
           dbClick={handleEventClick}
           removeEvent={handleDelEvent}
         />
