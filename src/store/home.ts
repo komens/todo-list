@@ -16,14 +16,16 @@ const initState: IState = {
   eventList: getData("event_list") || [],
 };
 
-const ADD_EVENT = "ADD_EVENT";
-const DEL_EVENT = "DEL_EVENT";
-const DONE_EVENT = "DONE_EVENT";
-const RESET_EVENT = "RESET_EVENT";
+enum EType {
+  ADD_EVENT = "ADD_EVENT",
+  DEL_EVENT = "DEL_EVENT",
+  DONE_EVENT = "DONE_EVENT",
+  RESET_EVENT = "RESET_EVENT",
+}
 
 function addEventMutation(event) {
   return {
-    type: ADD_EVENT,
+    type: EType.ADD_EVENT,
     event: event,
   };
 }
@@ -45,21 +47,21 @@ export type ID = string;
 
 export const delEvent = (id: ID) => {
   return {
-    type: DEL_EVENT,
+    type: EType.DEL_EVENT,
     id: id,
   };
 };
 
 export const doneEvent = (id: ID) => {
   return {
-    type: DONE_EVENT,
+    type: EType.DONE_EVENT,
     id: id,
   };
 };
 
 export const resetEvent = (id: ID) => {
   return {
-    type: RESET_EVENT,
+    type: EType.RESET_EVENT,
     id: id,
   };
 };
@@ -72,7 +74,7 @@ interface IPayload {
 
 export default (state: IState = initState, { type, event, id }: IPayload) => {
   switch (type) {
-    case ADD_EVENT: {
+    case EType.ADD_EVENT: {
       // 添加事件
       const newList = [...state.eventList, event];
       saveData("event_list", newList);
@@ -80,7 +82,7 @@ export default (state: IState = initState, { type, event, id }: IPayload) => {
         eventList: newList,
       };
     }
-    case DONE_EVENT: {
+    case EType.DONE_EVENT: {
       // 完成事件
       const newList = state.eventList.map((item) => {
         if (item.id === id) {
@@ -94,7 +96,7 @@ export default (state: IState = initState, { type, event, id }: IPayload) => {
         eventList: newList,
       };
     }
-    case RESET_EVENT: {
+    case EType.RESET_EVENT: {
       //重置事件
       const newList = state.eventList.map((item) => {
         if (item.id === id) {
@@ -108,7 +110,7 @@ export default (state: IState = initState, { type, event, id }: IPayload) => {
         eventList: newList,
       };
     }
-    case DEL_EVENT: {
+    case EType.DEL_EVENT: {
       // 删除事件
       const newList = state.eventList.filter((item) => item.id !== id);
       saveData("event_list", newList);
